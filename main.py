@@ -26,19 +26,13 @@ DB_USER = os.getenv('DB_USER')
 DB_PASS = os.getenv('DB_PASS')
 DB_NAME = os.getenv('DB_NAME')
 DB_HOST = os.getenv('DB_HOST')
-GUILD_TOKEN = os.getenv('GUILD_TOKEN')
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
-CHANNEL_TOKEN = os.getenv('CHANNEL_TOKEN')
+GUILD_TOKEN = int(os.getenv('GUILD_TOKEN'))
+CHANNEL_TOKEN = int(os.getenv('CHANNEL_TOKEN'))
+
+
 
 credentials = {"user": DB_USER, "password": DB_PASS, "database": DB_NAME, "host": DB_HOST}
-
-async def run():
-        
-    try:
-        await bot.start(AUTH_TOKEN)
-    except KeyboardInterrupt:
-        await bot.db.close()
-        await bot.logout()
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
@@ -61,8 +55,19 @@ class Bot(commands.Bot):
     async def on_message(self, message):        
         await self.process_commands(message)
         if message.content.startswith('ping'):                              
-            await message.channel.send('pong')            
+            await message.channel.send('pong')     
 
+description = "A discord bot written in Python that lets you socialize with your leetcode friends."
+intents = discord.Intents.all()
+bot = Bot(description=description, intents=intents)                   
+
+async def run():
+        
+    try:
+        await bot.start(AUTH_TOKEN)
+    except KeyboardInterrupt:
+        await bot.db.close()
+        await bot.logout()
 
 
 @tasks.loop(minutes=constants.POST_INTERVAL_MINUTES)       
@@ -111,13 +116,9 @@ async def makeDailyLeaderboardPost(ignoreSchedule = False):
                                         thumbnail=constants.DAILY_LB_THUMBNAIL, users=users, 
                                         authorImg = constants.DAILY_LB_AUTHOR_URL, endTs = endTs)
 
-        channel = bot.get_channel(CHANNEL_TOKEN)                    
-        await channel.send(embed=lb.getLeaderboard())
-
-
-description = "A discord bot written in Python that lets you socialize with your leetcode friends."
-intents = discord.Intents.all()
-bot = Bot(description=description, intents=intents)
+        file = discord.File(constants.DAILY_LB_THUMBNAIL, filename="image.png")                
+        channel = bot.get_channel(CHANNEL_TOKEN)                            
+        await channel.send(file = file, embed=lb.getLeaderboard())
 
 
 @bot.tree.command(name="add",description="Adds your leetcode username",guild=discord.Object(id=GUILD_TOKEN))
@@ -132,12 +133,12 @@ async def slash_command(interaction:discord.Interaction, username: str):
     await bot.db.execute(queries.removeUsernameQuery(username))
     await interaction.response.send_message("Removed " + username)   
 
-@bot.tree.command(name="dailylb",description="Shows the daily leaderboard",guild=discord.Object(id=1210192716995100715))
+@bot.tree.command(name="dailylb",description="Shows the daily leaderboard",guild=discord.Object(id=GUILD_TOKEN))
 async def slash_command(interaction:discord.Interaction):
     await makeDailyLeaderboardPost(True)
     logging.info("Slash command completed for daily leaderboard")
 
-# @bot.tree.command(name="weekly",description="Shows the weekly leaderboard",guild=discord.Object(id=1210192716995100715))
+# @bot.tree.command(name="weekly",description="Shows the weekly leaderboard",guild=discord.Object(id=GUILD_TOKEN))
 # async def slash_command(interaction:discord.Interaction):
 #     await interaction.response.send_message("Weekly dailyboard")
 
@@ -146,7 +147,7 @@ async def slash_command(interaction:discord.Interaction):
 # @bot.command(
 #     name="test",
 #     description="My first application Command",
-#     guild=discord.Object(id=1210192716995100715)
+#     guild=discord.Object(id=GUILD_TOKEN)
 # )
 # async def first_command(interaction):
 #     await interaction.channel.send("Hello from prefix command")
@@ -182,7 +183,6 @@ def getPostsFromUserData(userData):
         logging.info("Empty userData object. No post object created")
         
     return posts
-
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run())

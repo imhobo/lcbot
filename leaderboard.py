@@ -16,7 +16,7 @@ class Leaderboard:
     def getLeaderboard(self):
         self.endTs = self.endTs.astimezone()
         
-        embed=discord.Embed(title=self.title, 
+        embed=discord.Embed(title="** {0} **".format(self.title), 
             description="** {0} (Last 24 hours)**".format(self.endTs.strftime(constants.PRETTY_TIME_FORMAT)), 
             color=self.color)
                 
@@ -26,32 +26,40 @@ class Leaderboard:
             icon_url=self.authorImg
         )
 
-        embed.set_thumbnail(url=self.thumbnail)
-       
-        # [[1, 'avantika', 5, 5, 2, 12, 34], [2, 'monkbaby', 1, 1, 1, 3, 11], [3, 'what?', 1, 1, 0, 2, 4]]
+        embed.set_thumbnail(url="attachment://image.png")
+               
         body = []
         for user in self.users:
-            userData = []
-            userData.append(user['username'])
-            userData.append(int(user['easy']))
-            userData.append(int(user['med']))
-            userData.append(int(user['hard']))
-            userData.append(int(user['total']))
-            userData.append(int(user['score']))
-            body.append(userData)
+            userDict = {}            
+            userDict['username'] = user['username']
+            userDict['total'] = int(user['total'])
+            stats = []                        
+            stats.append(int(user['easy']))
+            stats.append(int(user['med']))
+            stats.append(int(user['hard']))
+            stats.append(int(user['total']))
+            stats.append(int(user['score']))
+            userDict['stats'] = stats
+            body.append(userDict)
 
-        sortedBody = sorted(body, key=lambda x: x[5], reverse=True)
+        sortedBody = sorted(body, key=lambda x: x['total'], reverse=True)
+    
         for i in range(0, len(sortedBody)):
-            elem = sortedBody[i]
-            elem.insert(0, i+1)
+            user = sortedBody[i]
+            user['rank'] =  i+1
 
-        output = t2a(
-            header=["No.", "Name", "E", "M", "H", "T", "Score"],
-            body=sortedBody,
-            style=PresetStyle.double_compact
-        )
+        # sortedBody = [{'rank': 1, 'username': 'avantikababy', 'stats': [15, 15, 12, 12, 34]}, 
+        #               {'rank': 2, 'username': 'monkbaby', 'stats': [1, 1, 1, 3, 11]}
+        #               ]
+             
+        for user in sortedBody:
+            output = t2a(
+                    header=["E", "M", "H", "T", "Pts"],
+                    body=[user['stats']],
+                    style=PresetStyle.plain
+                    )
+            embed.add_field(name="{0}. {1}".format(user['rank'], user['username']), value=f"```\n{output}\n```", inline=False) 
 
-        embed.add_field(name="", value=f"```\n{output}\n```", inline=False) 
         embed.set_footer(text="Easy = 1 Medium = 3 Hard = 7")
         return embed
     

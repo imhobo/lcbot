@@ -1,3 +1,4 @@
+import datetime as dt
 from datetime import datetime, timedelta
 
 POST_INTERVAL_MINUTES = 60
@@ -12,7 +13,8 @@ EMBED_COLOR_POST = 0x109319
 DAILY_LB_TITLE = "Daily Leaderboard"
 DAILY_LB_AUTHOR_URL = "https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png"
 POST_THUMBNAIL = "https://cdn.pixabay.com/photo/2016/03/31/17/55/achievement-1294004_1280.png"
-DAILY_LB_THUMBNAIL = "./assets/medal.png"
+DAILY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/main/assets/medal.png"
 DAILY_LB_POST_HOUR_UTC = 1
+DAILY_LB_TIME = dt.time(hour=0, minute=30) #utc time zone
 PRETTY_TIME_FORMAT = "%-d %b, %Y %-I:%M %p %Z "
 LC_URL = 'https://leetcode.com'

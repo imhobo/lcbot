@@ -26,7 +26,7 @@ class Leaderboard:
             icon_url=self.authorImg
         )
 
-        embed.set_thumbnail(url="attachment://image.png")
+        embed.set_thumbnail(url=self.thumbnail)
                
         body = []
         for user in self.users:
@@ -39,10 +39,10 @@ class Leaderboard:
             stats.append(int(user['hard']))
             stats.append(int(user['total']))
             stats.append(int(user['score']))
-            userDict['stats'] = stats
+            userDict['stats'] = stats            
             body.append(userDict)
 
-        sortedBody = sorted(body, key=lambda x: x['total'], reverse=True)
+        sortedBody = sorted(body, key=lambda x: x['score'], reverse=True)
     
         for i in range(0, len(sortedBody)):
             user = sortedBody[i]

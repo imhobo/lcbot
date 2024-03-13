@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
@@ -29,7 +29,6 @@ DB_HOST = os.getenv('DB_HOST')
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 GUILD_TOKEN = int(os.getenv('GUILD_TOKEN'))
 CHANNEL_TOKEN = int(os.getenv('CHANNEL_TOKEN'))
-
 
 
 credentials = {"user": DB_USER, "password": DB_PASS, "database": DB_NAME, "host": DB_HOST}
@@ -70,13 +69,13 @@ async def run():
         await bot.logout()
 
 
-@tasks.loop(minutes=constants.POST_INTERVAL_MINUTES)       
+@tasks.loop(time = utils.getPostTimes())       
 async def makePosts():    
     # Choose the time interval window for checking submissions    
     now = datetime.now()
     endTs = utils.floor_dt(now, constants.INTERVAL_DELTA)
     startTs = endTs - constants.INTERVAL_POST_DELTA
-    logging.info('Checking between {0} to {1}'.format(endTs, startTs))
+    logging.info('Checking between {0} to {1} {2}'.format(endTs, startTs, now.astimezone().tzname()))
 
     questions = utils.getAllQuestionsMap()
     usernames = await queries.getUsernames(bot)          
@@ -93,32 +92,31 @@ async def makePosts():
         await channel.send(embed=post.getPost())
 
 
-@tasks.loop(minutes=60)       
-async def makeDailyLeaderboardPost(ignoreSchedule = False):
-    if ignoreSchedule == True or datetime.utcnow().hour == constants.DAILY_LB_POST_HOUR_UTC:    
-        questions = utils.getAllQuestionsMap()
-        usernames = await queries.getUsernames(bot)    
-        # print(usernames)
-        now = datetime.now()
-        endTs = utils.floor_dt(now, constants.INTERVAL_DELTA)
-        startTs = endTs - constants.INTERVAL_DAILY_DELTA
-        logging.info('Checking between {0} to {1} for daily leaderboard'.format(endTs, startTs))
-        
-        users = []
-        for user in usernames:
-            response = await getUserSubmissions(user)
-            filtered_submissions = utils.filterSubmissions(response, startTs, endTs)    
-            lbUser = utils.getDailyLeaderboardUser(user, filtered_submissions, questions)       
-            users.append(lbUser)
-            # print(user + " : "  + str(len(response)) + " : " + str(len(filtered_submissions)))
-        
-        lb = leaderboard.Leaderboard(title=constants.DAILY_LB_TITLE, color=constants.EMBED_COLOR_DAILY_LB, 
-                                        thumbnail=constants.DAILY_LB_THUMBNAIL, users=users, 
-                                        authorImg = constants.DAILY_LB_AUTHOR_URL, endTs = endTs)
-
-        file = discord.File(constants.DAILY_LB_THUMBNAIL, filename="image.png")                
-        channel = bot.get_channel(CHANNEL_TOKEN)                            
-        await channel.send(file = file, embed=lb.getLeaderboard())
+@tasks.loop(time = constants.DAILY_LB_TIME)       
+async def makeDailyLeaderboardPost():
+    
+    questions = utils.getAllQuestionsMap()
+    usernames = await queries.getUsernames(bot)    
+    # print(usernames)
+    now = datetime.now()
+    endTs = utils.floor_dt(now, constants.INTERVAL_DELTA)
+    startTs = endTs - constants.INTERVAL_DAILY_DELTA
+    logging.info('Checking between {0} to {1} {2} for daily leaderboard'.format(endTs, startTs, now.astimezone().tzname()))
+    
+    users = []
+    for user in usernames:
+        response = await getUserSubmissions(user)
+        filtered_submissions = utils.filterSubmissions(response, startTs, endTs)    
+        lbUser = utils.getDailyLeaderboardUser(user, filtered_submissions, questions)       
+        users.append(lbUser)
+        # print(user + " : "  + str(len(response)) + " : " + str(len(filtered_submissions)))
+    
+    lb = leaderboard.Leaderboard(title=constants.DAILY_LB_TITLE, color=constants.EMBED_COLOR_DAILY_LB, 
+                                    thumbnail=constants.DAILY_LB_THUMBNAIL, users=users, 
+                                    authorImg = constants.DAILY_LB_AUTHOR_URL, endTs = endTs)
+    
+    channel = bot.get_channel(CHANNEL_TOKEN)                            
+    await channel.send(embed=lb.getLeaderboard())
 
 
 @bot.tree.command(name="add",description="Adds your leetcode username",guild=discord.Object(id=GUILD_TOKEN))
@@ -133,10 +131,10 @@ async def slash_command(interaction:discord.Interaction, username: str):
     await bot.db.execute(queries.removeUsernameQuery(username))
     await interaction.response.send_message("Removed " + username)   
 
-@bot.tree.command(name="dailylb",description="Shows the daily leaderboard",guild=discord.Object(id=GUILD_TOKEN))
-async def slash_command(interaction:discord.Interaction):
-    await makeDailyLeaderboardPost(True)
-    logging.info("Slash command completed for daily leaderboard")
+# @bot.tree.command(name="dailylb",description="Shows the daily leaderboard",guild=discord.Object(id=GUILD_TOKEN))
+# async def slash_command(interaction:discord.Interaction):
+#     await makeDailyLeaderboardPost()
+#     logging.info("Slash command completed for daily leaderboard")
 
 # @bot.tree.command(name="weekly",description="Shows the weekly leaderboard",guild=discord.Object(id=GUILD_TOKEN))
 # async def slash_command(interaction:discord.Interaction):

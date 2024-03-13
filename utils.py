@@ -1,3 +1,4 @@
+import datetime as dt
 from datetime import datetime
 import json
 import constants
@@ -122,3 +123,12 @@ def getDailyLeaderboardUser(username, submissions, questions):
 
     # print(user)
     return user
+
+#Returns a datetime object for every hour. Corresponds to xx:00 IST
+def getPostTimes():
+    times = []
+    for i in range(0, 24):
+        t = dt.time(hour=i, minute=30)
+        times.append(t)
+    
+    return times

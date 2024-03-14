@@ -32,7 +32,7 @@ class Leaderboard:
         for user in self.users:
             userDict = {}            
             userDict['username'] = user['username']
-            userDict['total'] = int(user['total'])
+            userDict['score'] = int(user['score'])
             stats = []                        
             stats.append(int(user['easy']))
             stats.append(int(user['med']))

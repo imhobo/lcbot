@@ -20,7 +20,7 @@ WEEKLY_LB_TIME = dt.time(hour=1, minute=30) #utc time zone
 WEEKLY_LB_DAY = 1 #0 = mon, 6 = sun
 WEEKLY_LB_TITLE = "Weekly Leaderboard"
 WEEKLY_LB_DESC = "Last 7 days"
-WEEKLY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/feature/weekly/assets/weekly_lb.png"
+WEEKLY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/main/assets/weekly_lb.png"
 POST_THUMBNAIL = "https://cdn.pixabay.com/photo/2016/03/31/17/55/achievement-1294004_1280.png"
 PRETTY_TIME_FORMAT = "%-d %b, %Y %-I:%M %p %Z "
 LC_URL = 'https://leetcode.com'

@@ -1,12 +1,12 @@
 import discord
-from datetime import datetime
 from table2ascii import table2ascii as t2a, PresetStyle
 import utils
 import constants
 
 class Leaderboard:
     def __init__(self, **kwargs):
-        self.title = kwargs.pop("title")        
+        self.title = kwargs.pop("title")
+        self.desc = kwargs.pop("desc")        
         self.color = kwargs.pop("color")        
         self.authorImg = kwargs.pop("authorImg")
         self.thumbnail = kwargs.pop("thumbnail")
@@ -17,7 +17,7 @@ class Leaderboard:
         self.endTs = self.endTs.astimezone()
         
         embed=discord.Embed(title="** {0} **".format(self.title), 
-            description="** {0} (Last 24 hours)**".format(self.endTs.strftime(constants.PRETTY_TIME_FORMAT)), 
+            description="** {0} ({1})**".format(self.endTs.strftime(constants.PRETTY_TIME_FORMAT), self.desc), 
             color=self.color)
                 
         embed.set_author(

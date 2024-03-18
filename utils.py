@@ -1,5 +1,5 @@
 import datetime as dt
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import constants
 
@@ -56,7 +56,7 @@ def getAllQuestionsMap():
 def filterSubmissions(submissions, startTs, endTs):
     validAcSubmissions = []
     for i in submissions:
-        acSubmissionTs = datetime.fromtimestamp(int(i["timestamp"]))
+        acSubmissionTs = getTimeFromEpoch(int(i["timestamp"]))
         if(endTs > acSubmissionTs and startTs <= acSubmissionTs):
              validAcSubmissions.append(i)
     return validAcSubmissions
@@ -77,11 +77,11 @@ def getValidSubmissions(submission, acSubmission, startTs, endTs):
                 titleToTs[titleSlug] = submissionTs
 
     for i in acSubmission:
-        acSubmissionTs = datetime.fromtimestamp(int(i["timestamp"]))
+        acSubmissionTs = getTimeFromEpoch(int(i["timestamp"]))
         if(endTs > acSubmissionTs and startTs <= acSubmissionTs):            
             titleSlug = i["titleSlug"]            
             if(titleSlug in titleToTs):
-                submissionTs = datetime.fromtimestamp(titleToTs[titleSlug])
+                submissionTs = getTimeFromEpoch(titleToTs[titleSlug])
                                 
                 if(submissionTs < startTs and submissionTs > (startTs - constants.INTERVAL_DAILY_DELTA)):
                     continue
@@ -132,3 +132,11 @@ def getPostTimes():
         times.append(t)
     
     return times
+
+
+def getTimeFromEpoch(epoch):
+    return datetime.fromtimestamp(epoch, tz=timezone.utc)
+
+def maxTimestamp(t1, t2):
+    if t1 > t2: return t1
+    return t2

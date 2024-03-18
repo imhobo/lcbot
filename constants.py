@@ -14,11 +14,12 @@ EMBED_COLOR_POST = 0x109319
 DAILY_LB_TITLE = "Daily Leaderboard"
 DAILY_LB_DESC = "Last 24 hours"
 DAILY_LB_AUTHOR_URL = "https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png"
-WEEKLY_LB_TITLE = "Weekly Leaderboard"
-WEEKLY_LB_DESC = "Last 7 days"
-POST_THUMBNAIL = "https://cdn.pixabay.com/photo/2016/03/31/17/55/achievement-1294004_1280.png"
 DAILY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/main/assets/medal.png"
 DAILY_LB_TIME = dt.time(hour=0, minute=30) #utc time zone
+WEEKLY_LB_TITLE = "Weekly Leaderboard"
+WEEKLY_LB_DESC = "Last 7 days"
+WEEKLY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/2757ea134025d02c820b704c47739ae5b7808692/assets/weekly_lb.png"
+POST_THUMBNAIL = "https://cdn.pixabay.com/photo/2016/03/31/17/55/achievement-1294004_1280.png"
 PRETTY_TIME_FORMAT = "%-d %b, %Y %-I:%M %p %Z "
 LC_URL = 'https://leetcode.com'
 DATE_FORMAT = "%Y-%m-%d"

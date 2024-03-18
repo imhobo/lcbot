@@ -181,7 +181,7 @@ async def makeWeeklyLeaderboardPost():
         # logging.info(users)
 
         lb = leaderboard.Leaderboard(title=constants.WEEKLY_LB_TITLE, desc=constants.WEEKLY_LB_DESC, 
-                                     color=constants.EMBED_COLOR_DAILY_LB, thumbnail=constants.DAILY_LB_THUMBNAIL, 
+                                     color=constants.EMBED_COLOR_DAILY_LB, thumbnail=constants.WEEKLY_LB_THUMBNAIL, 
                                      users=users, authorImg = constants.DAILY_LB_AUTHOR_URL, endTs = endTs)
         
         channel = bot.get_channel(CHANNEL_TOKEN)                            

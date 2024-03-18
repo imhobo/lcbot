@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands, tasks
 from discord import app_commands
 import logging
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 import random
 import asyncio
 import asyncpg
@@ -15,6 +15,9 @@ import constants
 import leaderboard
 from dotenv import load_dotenv
 import os
+import dbutil
+import json
+import lbutil
 
 load_dotenv()
 logging.basicConfig(
@@ -46,9 +49,13 @@ class Bot(commands.Bot):
         await self.tree.sync(guild=discord.Object(id=GUILD_TOKEN))
         logging.info('We have logged in as {0.user}'.format(self))
         self.db = await asyncpg.create_pool(**credentials)
-        logging.info('DB pool created')
+        await dbutil.createTables(self.db)
+        channel = bot.get_channel(CHANNEL_TOKEN)   
+        logging.info('DB pool created')        
+        
         makePosts.start()
-        makeDailyLeaderboardPost.start()
+        lbutil.makeDailyLeaderboardPost.start(bot.db, channel)
+        lbutil.makeWeeklyLeaderboardPost.start(bot.db, channel)
         logging.info('Started tracking LC submissions for everyone')
         
     async def on_message(self, message):        
@@ -72,13 +79,13 @@ async def run():
 @tasks.loop(time = utils.getPostTimes())       
 async def makePosts():    
     # Choose the time interval window for checking submissions    
-    now = datetime.now()
+    now = datetime.now(tz=timezone.utc)
     endTs = utils.floor_dt(now, constants.INTERVAL_DELTA)
     startTs = endTs - constants.INTERVAL_POST_DELTA
     logging.info('Checking between {0} to {1} {2}'.format(endTs, startTs, now.astimezone().tzname()))
 
     questions = utils.getAllQuestionsMap()
-    usernames = await queries.getUsernames(bot)          
+    usernames = await queries.getUsernames(bot.db)          
     allPosts = []
     for user in usernames:
         userData = await getUserDataFromLC(user, questions, startTs, endTs)
@@ -92,31 +99,7 @@ async def makePosts():
         await channel.send(embed=post.getPost())
 
 
-@tasks.loop(time = constants.DAILY_LB_TIME)       
-async def makeDailyLeaderboardPost():
-    
-    questions = utils.getAllQuestionsMap()
-    usernames = await queries.getUsernames(bot)    
-    # print(usernames)
-    now = datetime.now()
-    endTs = utils.floor_dt(now, constants.INTERVAL_DELTA)
-    startTs = endTs - constants.INTERVAL_DAILY_DELTA
-    logging.info('Checking between {0} to {1} {2} for daily leaderboard'.format(endTs, startTs, now.astimezone().tzname()))
-    
-    users = []
-    for user in usernames:
-        response = await getUserSubmissions(user)
-        filtered_submissions = utils.filterSubmissions(response, startTs, endTs)    
-        lbUser = utils.getDailyLeaderboardUser(user, filtered_submissions, questions)       
-        users.append(lbUser)
-        # print(user + " : "  + str(len(response)) + " : " + str(len(filtered_submissions)))
-    
-    lb = leaderboard.Leaderboard(title=constants.DAILY_LB_TITLE, color=constants.EMBED_COLOR_DAILY_LB, 
-                                    thumbnail=constants.DAILY_LB_THUMBNAIL, users=users, 
-                                    authorImg = constants.DAILY_LB_AUTHOR_URL, endTs = endTs)
-    
-    channel = bot.get_channel(CHANNEL_TOKEN)                            
-    await channel.send(embed=lb.getLeaderboard())
+
 
 
 @bot.tree.command(name="add",description="Adds your leetcode username",guild=discord.Object(id=GUILD_TOKEN))
@@ -164,7 +147,7 @@ def getPostsFromUserData(userData):
         footer = "This problem has an AC Rate of {0}"
         
         for p in userData['postableSubmissions']:
-            ts = datetime.fromtimestamp(int(p['timestamp']))
+            ts = utils.getTimeFromEpoch(int(p['timestamp']))
 
             q = p['question']
             acRate = q['acRate']

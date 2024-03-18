@@ -1,23 +1,24 @@
 import discord
-from datetime import datetime
 from table2ascii import table2ascii as t2a, PresetStyle
 import utils
 import constants
 
 class Leaderboard:
     def __init__(self, **kwargs):
-        self.title = kwargs.pop("title")        
+        self.title = kwargs.pop("title")
+        self.desc = kwargs.pop("desc")        
         self.color = kwargs.pop("color")        
         self.authorImg = kwargs.pop("authorImg")
         self.thumbnail = kwargs.pop("thumbnail")
         self.users = kwargs.pop("users")
         self.endTs = kwargs.pop("endTs")
+        self.type = kwargs.pop("type")
 
     def getLeaderboard(self):
         self.endTs = self.endTs.astimezone()
         
         embed=discord.Embed(title="** {0} **".format(self.title), 
-            description="** {0} (Last 24 hours)**".format(self.endTs.strftime(constants.PRETTY_TIME_FORMAT)), 
+            description="** {0} ({1})**".format(self.endTs.strftime(constants.PRETTY_TIME_FORMAT), self.desc), 
             color=self.color)
                 
         embed.set_author(
@@ -58,7 +59,14 @@ class Leaderboard:
                     body=[user['stats']],
                     style=PresetStyle.plain
                     )
-            embed.add_field(name="{0}. {1}".format(user['rank'], user['username']), value=f"```\n{output}\n```", inline=False) 
+            if self.type == "WEEKLY":
+                suffix = ""
+                if user['rank'] == 1:suffix = ":first_place:"
+                elif user['rank'] == 2:suffix = ":second_place:"
+                elif user['rank'] == 3:suffix = ":third_place:"
+                embed.add_field(name="{0}. {1} {2}".format(user['rank'], user['username'], suffix), value=f"```\n{output}\n```", inline=False) 
+            elif self.type == "DAILY":                
+                embed.add_field(name="{0}. {1}".format(user['rank'], user['username']), value=f"```\n{output}\n```", inline=False) 
 
         embed.set_footer(text="Easy = 1 Medium = 3 Hard = 7")
         return embed

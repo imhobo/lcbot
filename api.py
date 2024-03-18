@@ -1,7 +1,7 @@
 import traceback
 import requests
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import constants
 import utils
 from constants import LC_API_URL
@@ -68,7 +68,7 @@ async def getQuestion(titleSlug):
 
 
 
-async def getUserDataFromLC(username, questions, startTs = datetime.min, endTs = datetime.now()):    
+async def getUserDataFromLC(username, questions, startTs = datetime.min, endTs = datetime.utcnow()):    
     user = {}
     try:
         response_json = await getUserProfile(username)      
@@ -86,7 +86,7 @@ async def getUserDataFromLC(username, questions, startTs = datetime.min, endTs =
     return user
     
 async def main():
-    now = datetime.now()
+    now = datetime.now(tz=timezone.utc)
     endTs = utils.floor_dt(now, constants.INTERVAL_HOUR_DELTA)
     startTs = endTs - constants.INTERVAL_DAILY_DELTA
     response = await getUserSubmissions('avantika')

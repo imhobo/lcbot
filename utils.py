@@ -2,6 +2,9 @@ import datetime as dt
 from datetime import datetime, timezone
 import json
 import constants
+import logging
+
+log = logging.getLogger(__name__)
 
 def floor_dt(dt, delta):
     return dt - (dt - datetime.min.replace(tzinfo=timezone.utc)) % delta
@@ -104,6 +107,11 @@ def getDailyLeaderboardUser(username, submissions, questions):
     hard = 0
     for s in submissions:
         titleSlug = s['titleSlug']
+        
+        if titleSlug not in questions: 
+            logging.error("Could not find {0}".format(titleSlug))
+            continue
+        
         question = questions[titleSlug]
         if(question['difficulty'] == "Easy"):
             easy += 1

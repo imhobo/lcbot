@@ -37,7 +37,7 @@ def getAllQuestionsMap():
     algoQuestions = readQuestionFile(constants.ALGORITHMS_API_FILE)
     dbQuestions = readQuestionFile(constants.DATABASE_API_FILE)
 
-    return algoQuestions | dbQuestions
+    return {**algoQuestions, **dbQuestions}
 
 
 def readQuestionFile(filename):
@@ -156,4 +156,3 @@ def getTimeFromEpoch(epoch):
 def maxTimestamp(t1, t2):
     if t1 > t2: return t1
     return t2
-

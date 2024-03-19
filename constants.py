@@ -15,9 +15,9 @@ DAILY_LB_TITLE = "Daily Leaderboard"
 DAILY_LB_DESC = "Last 24 hours"
 DAILY_LB_AUTHOR_URL = "https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png"
 DAILY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/main/assets/medal.png"
-DAILY_LB_TIME = dt.time(hour=1, minute=15) #utc time zone
-WEEKLY_LB_TIME = dt.time(hour=1, minute=30) #utc time zone
-WEEKLY_LB_DAY = 1 #0 = mon, 6 = sun
+DAILY_LB_TIME = dt.time(hour=0, minute=30) #utc time zone
+WEEKLY_LB_TIME = dt.time(hour=1, minute=0) #utc time zone
+WEEKLY_LB_DAY = 6 #0 = mon, 6 = sun
 WEEKLY_LB_TITLE = "Weekly Leaderboard"
 WEEKLY_LB_DESC = "Last 7 days"
 WEEKLY_LB_THUMBNAIL = "https://raw.githubusercontent.com/imhobo/lcbot/main/assets/weekly_lb.png"

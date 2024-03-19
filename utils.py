@@ -101,7 +101,7 @@ def getValidSubmissions(submission, acSubmission, startTs, endTs):
 def getDailyLeaderboardUser(username, submissions, questions):
 
     user = {}
-    total = len(submissions)
+    total = 0
     easy = 0
     medium = 0
     hard = 0
@@ -109,7 +109,7 @@ def getDailyLeaderboardUser(username, submissions, questions):
         titleSlug = s['titleSlug']
         
         if titleSlug not in questions: 
-            logging.error("Could not find {0}".format(titleSlug))
+            logging.error("Could not find {0} during daily lb".format(titleSlug))
             continue
         
         question = questions[titleSlug]
@@ -119,6 +119,7 @@ def getDailyLeaderboardUser(username, submissions, questions):
             medium += 1            
         elif(question['difficulty'] == "Hard"):
             hard += 1    
+        total += 1
 
     score = easy + medium * 3 + hard * 7
 

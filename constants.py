@@ -9,6 +9,7 @@ INTERVAL_DAILY_DELTA = timedelta(hours=24)
 INTERVAL_WEEKLY_DELTA = timedelta(days=7)
 LC_API_URL = "http://localhost:3000"
 ALGORITHMS_API_FILE = "resources/algorithms"
+DATABASE_API_FILE = "resources/database"
 EMBED_COLOR_DAILY_LB = 0x109319
 EMBED_COLOR_WEEKLY_LB = 0xFFD700
 DAILY_LB_TITLE = "Daily Leaderboard"

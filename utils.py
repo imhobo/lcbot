@@ -33,7 +33,15 @@ def getDifficultyString(difficultyLevel):
     
 
 def getAllQuestionsMap():
-    with open(constants.ALGORITHMS_API_FILE) as user_file:
+
+    algoQuestions = readQuestionFile(constants.ALGORITHMS_API_FILE)
+    dbQuestions = readQuestionFile(constants.DATABASE_API_FILE)
+
+    return algoQuestions | dbQuestions
+
+
+def readQuestionFile(filename):
+    with open(filename) as user_file:
         file_contents = user_file.read()
 
     parsed_json = json.loads(file_contents)
@@ -54,7 +62,6 @@ def getAllQuestionsMap():
         questions[stat['question__title_slug']] = question
     return questions
 
-    # print(questions)
 
 def filterSubmissions(submissions, startTs, endTs):
     validAcSubmissions = []
@@ -149,3 +156,4 @@ def getTimeFromEpoch(epoch):
 def maxTimestamp(t1, t2):
     if t1 > t2: return t1
     return t2
+

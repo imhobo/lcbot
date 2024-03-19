@@ -77,7 +77,11 @@ async def getUserDataFromLC(username, questions, startTs = datetime.min, endTs =
         submissions = utils.getValidSubmissions(response_json['submission'], response_json['acSubmission'], startTs, endTs)
         user['postableSubmissions'] = submissions
         for i in user['postableSubmissions']:
-            titleSlug = i['titleSlug']
+            titleSlug = i['titleSlug']            
+            if titleSlug not in questions: 
+                logging.error("Could not find {0} during making a post".format(titleSlug))
+                continue
+
             questionResponse = questions[titleSlug]
             i['question'] = questionResponse
     except Exception as e:

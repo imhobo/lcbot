@@ -149,6 +149,7 @@ def getPostsFromUserData(userData):
         for p in userData['postableSubmissions']:
             ts = utils.getTimeFromEpoch(int(p['timestamp']))
 
+            if 'question' not in p: continue
             q = p['question']
             acRate = q['acRate']
             description = "[** #LC {0} - {1}**]({2})".format(q['frontend_question_id'], q['question__title'], q['link'])
